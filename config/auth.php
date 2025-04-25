@@ -17,6 +17,7 @@ return [
         'guard' => 'web',
         'passwords' => 'users',
     ],
+    
 
     /*
     |--------------------------------------------------------------------------
@@ -40,6 +41,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'api' => [
+            'driver' => 'jwt',
+            'provider' => 'users',
+        ]
     ],
 
     /*
@@ -59,7 +64,7 @@ return [
     |
     */
 
-    'providers' => [
+    'providers' => [    
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
