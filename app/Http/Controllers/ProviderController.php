@@ -9,12 +9,12 @@ class ProviderController extends Controller
 {
     public function getProvider(){
         $provider = Provider::all();
-        return response()->json(data: ["data" => $provider]);
+        return response()->json(['status' => 'success', 'message' =>'Data successfull fetched', "providers" => $provider]);
     }
 
     public function getProviderByID($id){
-        $provider = Provider::find($id);
-        if (!$provider) return response()->json(['message' => 'Provider not found'], 404);
-        return response()->json($provider);
+        $provider = Provider::where('category_id', $id)->get();
+        if (!$provider) return response()->json(['status' => 'error', 'message' => 'Provider not found'], 404);
+        return response()->json(['status' => 'success', 'message' =>'Data successfull fetched', "providers" => $provider]);
     }
 }

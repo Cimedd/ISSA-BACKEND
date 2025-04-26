@@ -9,6 +9,15 @@ class Transaction extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'type',
+        'status',
+        'user_id',
+        'receiver_id',
+        'amount'
+    ];
+
+
     public function details(){
         return $this->hasOne(TransactionDetail::class);
     }

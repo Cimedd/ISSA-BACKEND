@@ -13,6 +13,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class TransactionController extends Controller
 {
     public function getAll(){
+        
         $user = JWTAuth::user();
         $transactions = Transaction::with('details')->get();
 
@@ -23,12 +24,11 @@ class TransactionController extends Controller
                 ->where('user_id', $user->id)  // Filter by user_id for regular users
                 ->get();
         }
-        return response()->json($transactions);
+        return response()->json(['status' => 'success','message' => 'Data successfully fetched', 'transactions' => $transactions]);
     }
 
     public function getTransactionByStatus(Request $request){
-        
-        $transactions = Transaction::with('details')->where('status', $request->filter)->get();
+
         if (Auth::user()->role === 'admin') {
             $transactions = Transaction::with('details')->where('status', $request->filter)->get();
         } else {
@@ -37,11 +37,10 @@ class TransactionController extends Controller
                 ->where('user_id', Auth::id())
                 ->get();
         }
-        return response()->json($transactions);
+        return response()->json(['status' => 'success','message' => 'Data successfully fetched', 'transactions' => $transactions]);
     }
 
     public function getTransactionByType(Request $request){
-        $transactions = Transaction::with('details')->where('type', $request->filter)->get();
         if (Auth::user()->role === 'admin') {
             $transactions = Transaction::with('details')->where('type', $request->filter)->get();
         } else {
@@ -50,7 +49,7 @@ class TransactionController extends Controller
                 ->where('user_id', Auth::id())
                 ->get();
         }
-        return response()->json($transactions);
+        return response()->json(['status' => 'success','message' => 'Data successfully fetched', 'transactions' => $transactions]);
     }
 
     public function insert(Request $request){
@@ -58,38 +57,48 @@ class TransactionController extends Controller
         DB::beginTransaction();
 
         try {
-            
             $transaction = Transaction::create([
                 'type' => $request->type,
                 'amount' => $request->amount,
                 'status' => $request->status,
-                'user_id' => $request->auth()->user()->id,  // Sender
+                'user_id' => auth()->user()->id,  // Sender
                 'receiver_id' => $request->receiver_id,     // Receiver
                 'created_at' => now(),
             ]);
+
+            TransactionDetail::create([
+                'transaction_id' => $transaction->id,
+                'details' => $request->details, 
+            ]);
     
             // Deduct amount from the sender's balance
-            $sender = User::find($request->auth()->user()->id);
-            $sender->balance -= $request->amount;
+            $sender = User::find(auth()->user()->id);
+            if($request->type == "deposit"){
+                $sender->saldo += $request->amount;
+            }
+            else{
+                $sender->saldo -= $request->amount;
+            }
+           
             $sender->save();
     
             if($request->receiver_id!= null){
                 $receiver = User::find($request->receiver_id);
-                $receiver->balance += $request->amount;
+                $receiver->saldo += $request->amount;
                 $receiver->save();
             }
-        
-    
+
+            
             // Commit the transaction
             DB::commit();
     
-            return response()->json(['message' => 'Transaction successful'], 201);
+            return response()->json(['status' => 'success','message' => 'Transaction successful'], 201);
         } catch (\Exception $e) {
             // Rollback the transaction if anything fails
             DB::rollBack();
     
             // Handle the error (you can log or return an error response)
-            return response()->json(['message' => 'Transaction failed', 'error' => $e->getMessage()], 500);
+            return response()->json(['status' => 'success', 'message' => 'Transaction failed', 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -97,7 +106,7 @@ class TransactionController extends Controller
     {
         $transaction = Transaction::find($id);
         if (!$transaction) {
-            return response()->json(['message' => 'Transaction not found'], 404);
+            return response()->json(['status' => 'success', 'message' => 'Transaction not found'], 404);
         }
 
         $transaction->update($request->all());
@@ -108,11 +117,11 @@ class TransactionController extends Controller
     {
         $transaction = Transaction::find($id);
         if (!$transaction) {
-            return response()->json(['message' => 'Transaction not found'], 404);
+            return response()->json(['status' => 'success', 'message' => 'Transaction not found'], 404);
         }
 
         $transaction->delete();
-        return response()->json(['message' => 'Transaction deleted']);
+        return response()->json(['status' => 'success', 'message' => 'Transaction deleted']);
     }
 
     

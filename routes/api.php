@@ -36,6 +36,9 @@ Route::group(['middleware' => ['auth:api']], function() {
     Route::post('/logout',[AuthController::class, 'logout']);
     // Shared route for both admin and user
     Route::get('/transactions', [TransactionController::class, 'getAll']);
+    Route::get('/transactions/status', [TransactionController::class, 'getTransactionByStatus']);
+    Route::get('/transactions/type', [TransactionController::class, 'getTransactionByType']);
+    Route::post('/transactions', [TransactionController::class, 'insert']);
      // Providers
      Route::get('/providers', [ProviderController::class, 'getProvider']);
      Route::get('/providers/{id}', [ProviderController::class, 'getProviderByID']);
@@ -48,14 +51,14 @@ Route::group(['middleware' => ['auth:api']], function() {
     Route::group(['middleware' => ['role:admin']], function() {
         Route::put('/transactions/{id}', [TransactionController::class, 'update']);
         Route::delete('/transactions/{id}', [TransactionController::class, 'delete']);
-        Route::post('/transactions', [TransactionController::class, 'insert']);
         Route::post('/providers', [ProviderController::class, 'insert']);
         Route::post('/products', [ProductController::class, 'insert']);
     });
 
     Route::group(['middleware' => ['role:user']], function() {
         Route::get('/contacts', action: [UserController::class, 'contacts']);
-        Route::get('/contacts/{phone}', action: [UserController::class, 'contacts']);
+        Route::get('/contacts/{phone}', action: [UserController::class, 'search']);
+        Route::get('/users', [UserController::class, 'user']);
     });
 });
 
