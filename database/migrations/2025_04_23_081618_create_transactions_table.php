@@ -17,6 +17,7 @@ return new class extends Migration
             $table->double('amount');
             $table->enum('status',['cancelled', 'pending', 'success'])->default('success');
             $table->foreignId('user_id')->constrained();
+            $table->foreignId('receiver_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

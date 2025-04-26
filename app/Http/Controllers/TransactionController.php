@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class TransactionController extends Controller
@@ -53,18 +55,42 @@ class TransactionController extends Controller
 
     public function insert(Request $request){
 
-        $transaction = Transaction::create([
-            'type' => $request->type,
-            'amount' => $request->amount,
-            'status' => $request->status,
-            'user_id' => $request->auth()->user()->id,  
-            'created_at' => $request->time,
-        ]
-        );
-        TransactionDetail::create([
-            'transaction_id' => $transaction->id,
-            'details' => $request->details]);
-        return response()->json(['message' => 'Transaction deleted successfully'], 201);
+        DB::beginTransaction();
+
+        try {
+            
+            $transaction = Transaction::create([
+                'type' => $request->type,
+                'amount' => $request->amount,
+                'status' => $request->status,
+                'user_id' => $request->auth()->user()->id,  // Sender
+                'receiver_id' => $request->receiver_id,     // Receiver
+                'created_at' => now(),
+            ]);
+    
+            // Deduct amount from the sender's balance
+            $sender = User::find($request->auth()->user()->id);
+            $sender->balance -= $request->amount;
+            $sender->save();
+    
+            if($request->receiver_id!= null){
+                $receiver = User::find($request->receiver_id);
+                $receiver->balance += $request->amount;
+                $receiver->save();
+            }
+        
+    
+            // Commit the transaction
+            DB::commit();
+    
+            return response()->json(['message' => 'Transaction successful'], 201);
+        } catch (\Exception $e) {
+            // Rollback the transaction if anything fails
+            DB::rollBack();
+    
+            // Handle the error (you can log or return an error response)
+            return response()->json(['message' => 'Transaction failed', 'error' => $e->getMessage()], 500);
+        }
     }
 
     public function update(Request $request, $id)

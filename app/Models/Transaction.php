@@ -12,4 +12,17 @@ class Transaction extends Model
     public function details(){
         return $this->hasOne(TransactionDetail::class);
     }
+
+    public function sender()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function receiver()
+    {
+        return $this->belongsTo(User::class, 'receiver_id');
+    }
+
+
+    
 }
