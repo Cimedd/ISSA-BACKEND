@@ -21,7 +21,14 @@ class UserController extends Controller
     {
         $user = auth()->user();
     
-        return response()->json($user);
+        return response()->json(["status" => "success", "message" => "Contact fetched", "user" => $user]);
+    }
+
+    public function saldo()
+    {
+        $user = auth()->user();
+    
+        return response()->json(["status" => "success", "message" => "Contact fetched", "user" =>$user->saldo]);
     }
 
     public function update(Request $request){

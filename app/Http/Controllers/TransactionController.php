@@ -24,7 +24,23 @@ class TransactionController extends Controller
                 ->where('user_id', $user->id)  // Filter by user_id for regular users
                 ->get();
         }
-        return response()->json(['status' => 'success','message' => 'Data successfully fetched', 'transactions' => $transactions]);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Data successfully fetched',
+            'transactions' => $transactions->map(function ($transaction) {
+                return [
+                    'id' => $transaction->id,
+                    'type' => $transaction->type,
+                    'amount' => $transaction->amount,
+                    'status' => $transaction->status,
+                    'user_id' => $transaction->user_id,
+                    'receiver_id' => $transaction->receiver_id,
+                    'created_at' => $transaction->created_at,
+                    'updated_at' => $transaction->updated_at,
+                    'details' => $transaction->details->details,  // Only include the 'details' field from the related 'details' table
+                ];
+            }),
+        ]);
     }
 
     public function getTransactionByStatus(Request $request){

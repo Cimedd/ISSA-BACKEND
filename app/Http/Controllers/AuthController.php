@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -28,7 +29,7 @@ class AuthController extends Controller
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
-            'password' => Hash::make($request->password),
+            'password' =>  $request->password,
             'phone_number' => $request->phone_number
         ]);
 
@@ -48,7 +49,7 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return response()->json(["status" => "error", "message" => $validator->errors()->first()], 422);
         }
 
         $credentials = $request->only('phone_number', 'password');
@@ -58,11 +59,17 @@ class AuthController extends Controller
             return response()->json(['status'=> 'error', 'message' => 'Email not verified. Please check your inbox.'], 403);
         }
 
-        if (!$token = JWTAuth::attempt($credentials)) {
-            return response()->json(['status'=> 'error','message' => 'Invalid credentials'], 401);
+        if ($credentials['password'] !== $user->password) {
+            return response()->json(['status'=> 'error', 'message' => 'Invalid credentials'], 401);
         }
 
-        return response()->json(['token' => $token]);
+        $token = JWTAuth::fromUser($user);
+    
+        if (!$token) {
+            return response()->json(['status'=> 'error','message' => 'Could not create token'], 500);
+        }
+        
+        return response()->json(['status'=> 'success','message' => 'Login Success','token' => $token, "userId" => $user->id, "name" => $user->name]);
     }
 
     public function logout()

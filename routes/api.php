@@ -59,6 +59,8 @@ Route::group(['middleware' => ['auth:api']], function() {
         Route::get('/contacts', action: [UserController::class, 'contacts']);
         Route::get('/contacts/{phone}', action: [UserController::class, 'search']);
         Route::get('/users', [UserController::class, 'user']);
+        Route::get('/users/{id}', [UserController::class, 'user']);
+        Route::get('/users/saldo', [UserController::class, 'saldo']);
     });
 });
 
