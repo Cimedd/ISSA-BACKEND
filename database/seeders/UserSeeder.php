@@ -16,12 +16,13 @@ class UserSeeder extends Seeder
         $users = [
             [
                 'name' => 'John Doe',
-                'email' => 'john@example.com',
+                'email' => 'edwardleonardo777@gmail.com',
                 'password' => bcrypt('password'),
                 'phone_number' => '081234567890',
                 'saldo' => 100000,
                 'point' => 50,
                 'role' => 'user',
+                'pin' => bcrypt('123456')
             ],
             [
                 'name' => 'Jane Smith',
@@ -31,6 +32,7 @@ class UserSeeder extends Seeder
                 'saldo' => 200000,
                 'point' => 100,
                 'role' => 'user',
+                'pin' => bcrypt('123456')
             ],
             [
                 'name' => 'Michael Brown',
@@ -40,6 +42,7 @@ class UserSeeder extends Seeder
                 'saldo' => 150000,
                 'point' => 75,
                 'role' => 'user',
+                'pin' => bcrypt('123456')
             ],
             [
                 'name' => 'Sarah White',
@@ -49,6 +52,7 @@ class UserSeeder extends Seeder
                 'saldo' => 50000,
                 'point' => 25,
                 'role' => 'user',
+                'pin' => bcrypt('123456')
             ],
             [
                 'name' => 'David Black',
@@ -58,6 +62,7 @@ class UserSeeder extends Seeder
                 'saldo' => 300000,
                 'point' => 150,
                 'role' => 'admin',
+                'pin' => bcrypt('123456')
             ],
         ];
 

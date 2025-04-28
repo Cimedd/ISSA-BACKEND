@@ -18,6 +18,7 @@ class ProductSeeder extends Seeder
             ['name' => 'Product 3', 'description' => 'Description for Product 3', 'price' => 300000, 'provider_id' => 3],
             ['name' => 'Product 4', 'description' => 'Description for Product 4', 'price' => 150000, 'provider_id' => 4],
             ['name' => 'Product 5', 'description' => 'Description for Product 5', 'price' => 250000, 'provider_id' => 1],
+            ['name' => 'Product 6', 'description' => 'Description for Product 6', 'price' => 250000, 'provider_id' => 5],
         ];
 
         Product::insert($products);

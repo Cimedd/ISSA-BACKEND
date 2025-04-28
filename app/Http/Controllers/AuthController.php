@@ -19,7 +19,8 @@ class AuthController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:6',
-            'phone_number' => 'required|string|max:15|unique:users,phone_number'
+            'phone_number' => 'required|string|max:15|unique:users,phone_number',
+            'pin' => 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -29,7 +30,7 @@ class AuthController extends Controller
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
-            'password' =>  $request->password,
+            'password' =>  Hash::make($request->password),
             'phone_number' => $request->phone_number
         ]);
 
@@ -42,25 +43,29 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'phone_number'  => 'required|string',
             'password'  => 'required|string'
         ]);
 
         if ($validator->fails()) {
-            return response()->json(["status" => "error", "message" => $validator->errors()->first()], 422);
+            return response()->json(["status" => "error", "message" => $validator->errors()->first()]);
         }
 
         $credentials = $request->only('phone_number', 'password');
+
+        if (!$token = JWTAuth::attempt($credentials)) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Invalid credentials'
+            ], 401);
+        }
+        
         $user = User::where('phone_number', $credentials['phone_number'])->first();
 
         if (!$user->hasVerifiedEmail()) {
+            $user->sendEmailVerificationNotification();
             return response()->json(['status'=> 'error', 'message' => 'Email not verified. Please check your inbox.'], 403);
-        }
-
-        if ($credentials['password'] !== $user->password) {
-            return response()->json(['status'=> 'error', 'message' => 'Invalid credentials'], 401);
         }
 
         $token = JWTAuth::fromUser($user);

@@ -14,11 +14,12 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            ['name' => 'Electronics'],
-            ['name' => 'Fashion'],
-            ['name' => 'Home Appliances'],
-            ['name' => 'Health & Beauty'],
-            ['name' => 'Sports'],
+            ['name' => 'Electricity'],
+            ['name' => 'Internet'],
+            ['name' => 'Game'],
+            ['name' => 'Food'],
+            ['name' => 'Emoney'],
+            ['name' => 'Data'],
         ];
 
         Category::insert($categories);

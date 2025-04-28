@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class TransactionController extends Controller
@@ -70,6 +71,16 @@ class TransactionController extends Controller
 
     public function insert(Request $request){
 
+        if($request->pin !== null){
+            $user = auth()->user();
+            if (!Hash::check($request->pin, $user->pin)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Invalid PIN'
+                ], 401);
+            }
+        }
+     
         DB::beginTransaction();
 
         try {
