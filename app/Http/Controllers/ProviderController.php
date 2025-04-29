@@ -17,4 +17,9 @@ class ProviderController extends Controller
         if (!$provider) return response()->json(['status' => 'error', 'message' => 'Provider not found'], 404);
         return response()->json(['status' => 'success', 'message' =>'Data successfull fetched', "providers" => $provider]);
     }
+
+    public function insert(Request $request){
+        $provider = Provider::create($request->all());
+        return response()->json(['status' => 'success', 'message' =>'Data successfull fetched', "products" => $provider]);
+    }
 }

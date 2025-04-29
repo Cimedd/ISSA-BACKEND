@@ -9,6 +9,13 @@ class Product extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'price',
+        'description',
+        'provider_id'
+    ];
+
     public function providers(){
         return $this->belongsTo(Provider::class);
     }

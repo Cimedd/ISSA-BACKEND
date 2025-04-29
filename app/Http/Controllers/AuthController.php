@@ -74,7 +74,7 @@ class AuthController extends Controller
             return response()->json(['status'=> 'error','message' => 'Could not create token'], 500);
         }
         
-        return response()->json(['status'=> 'success','message' => 'Login Success','token' => $token, "userId" => $user->id, "name" => $user->name]);
+        return response()->json(['status'=> 'success','message' => 'Login Success','token' => $token, "userId" => $user->id, "name" => $user->name, "role" => $user->role]);
     }
 
     public function logout()
